@@ -14,7 +14,7 @@
         {
             "matches": [
                 "*://vrchat.com/home/*",
-                "*://vrchat.com/launch/*"
+                "*://vrchat.com/home"
             ],
             "js": [
                 "content.js"
