@@ -5,11 +5,22 @@
     const markerClass = "lackofbindings";
     const cardContentSelector = ".card-text";
 
-    const locationsPagePath = "/home/locations";
+    const locationsPagePath = "/home/locations"
+    const homePagePath = "/home";
     const locationsInstanceLinkSelector = `#app .locations a[href^="/home/launch"]`;
     const locationRegionBadgeSelector = `div[aria-label="Region Badge"]`;
 
     const userCache = new Map();
+
+    let observer = new MutationObserver((mutationList, observer) => {
+        for (let record of mutationList)
+        {
+            // Prevent triggering ourselves
+            if(record.target.classList.contains(markerClass)) return;
+            if(record.target.querySelector(`.${markerClass}`)) return;
+        }
+        doPageModify();
+    });
 
     async function getUserDetails(userId)
     {
@@ -147,31 +158,53 @@
     function cleanUp()
     {
         try {
+            
+            // Remove any added elements
             let ours = document.querySelectorAll(`.${markerClass}`);
             for(let node of ours)
             {
                 node.remove();
                 node = null;
             }
-        } catch (error) {
+            
+            // Stop observer
+            detachObserver();
+
+            } catch (error) {
             console.error("During Cleanup:", error);
         }
     }
-
-
-    // Check to make sure we're on launch or locations page, then modify the page.
-    let pathname = new URL(document.URL).pathname;
     
-    if(pathname.startsWith(launchPagePath))
+    function attachObserver()
     {
-        cleanUp();
-        tryAddLaunchPageDetails();
+        observer.observe(document.body, { childList: true, subtree: true, attributes: false });
     }
-    else if (pathname.startsWith(locationsPagePath))
+    function detachObserver()
     {
-        cleanUp();
-        tryAddLocationsPageDetails();
+        if(!observer) return;
+        observer.disconnect();
+        observer.takeRecords(); // deplete the queue
     }
+
+    async function doPageModify()
+    {
+        // Check to make sure we're on a valid page, then modify the page appropriately.
+        switch(location.pathname.replace(/\/$/,"").toLowerCase())
+        {
+            case launchPagePath:
+                cleanUp();
+                await tryAddLaunchPageDetails();
+                break;
+            case homePagePath:
+            case locationsPagePath:
+                cleanUp();
+                await tryAddLocationsPageDetails();
+                attachObserver();
+                break;
+        }
+    }
+
+    doPageModify();
 
 
 })();
