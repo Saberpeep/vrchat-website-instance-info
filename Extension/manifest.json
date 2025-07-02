@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "name": "VRChat Website Image Resizer",
+    "name": "VRChat Instance Info",
     "version": "1.0.1",
     "description": "Automatically resizes images to be <= 2048px before before uploading to VRChat",
     "icons": {
@@ -13,7 +13,8 @@
     "content_scripts": [
         {
             "matches": [
-                "*://vrchat.com/home/*"
+                "*://vrchat.com/home/*",
+                "*://vrchat.com/launch/*"
             ],
             "js": [
                 "content.js"
@@ -22,7 +23,7 @@
     ],
     "browser_specific_settings": {
         "gecko": {
-            "id": "{36654862-cab8-46e4-8ef5-7d1d99c85fec}"
+            "id": "{5921f000-aa4f-4dc9-aa62-46623162d091}"
         }
     }
 }
