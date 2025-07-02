@@ -94,19 +94,30 @@
             // Look for the area with the details
             let cardBody = document.querySelector(cardBodySelector);
             console.log("On Launch Page, container:", cardBody);
+            // Often cardBody isn't present yet if page is still loading.
+            if(!cardBody) return;
 
             // Get existing details node
             let cardContentOrig = cardBody.querySelector(cardContentSelector);
 
             // Get instance details
             let { userId, region } = extractInfoFromURL(document.URL);
-            let user = await getUserDetails(userId);
 
-            // Duplicate and modify with new info
-            let cardContentOwner = addDetailsNode(cardContentOrig.cloneNode(true), "Instance Owner: ", user.displayName, `/home/user/${user.id}`, cardContentOrig);
+            // If we can't get the user ID, just skip it (Public instances, Group instances, etc.)
+            let cardContentOwner;
+            if(userId)
+            {
+                let user = await getUserDetails(userId);
+    
+                // After the async call, check again that we haven't already done this.
+                if(cardBody.querySelector(`.${markerClass}`)) return;
+    
+                // Duplicate and modify with new info
+                cardContentOwner = addDetailsNode(cardContentOrig.cloneNode(true), "Instance Owner: ", user.displayName, `/home/user/${user.id}`, cardContentOrig);
+            }
             
             // Make another for region info (because its basically free from the URL)
-            addDetailsNode(cardContentOrig.cloneNode(true), `Region: ${region.toUpperCase()}`, "", "", cardContentOwner);
+            addDetailsNode(cardContentOrig.cloneNode(true), `Region: ${region.toUpperCase()}`, "", "", cardContentOwner || cardContentOrig);
 
         } catch (error) {
             cleanUp();
@@ -132,6 +143,9 @@
                     let { userId } = extractInfoFromURL(link.href);
                     if(!userId) continue; // Might be a group instance or something else
                     let user = await getUserDetails(userId);
+
+                    // After the async call, check again that we haven't already done this.
+                    if(link.parentElement.querySelector(`.${markerClass}`)) return;
     
                     // Modify new element
                     newItem.classList.add(markerClass);
@@ -168,9 +182,9 @@
             }
             
             // Stop observer
-            detachObserver();
+            // detachObserver();
 
-            } catch (error) {
+        } catch (error) {
             console.error("During Cleanup:", error);
         }
     }
@@ -188,23 +202,27 @@
 
     async function doPageModify()
     {
-        // Check to make sure we're on a valid page, then modify the page appropriately.
-        switch(location.pathname.replace(/\/$/,"").toLowerCase())
-        {
-            case launchPagePath:
-                cleanUp();
-                await tryAddLaunchPageDetails();
-                break;
-            case homePagePath:
-            case locationsPagePath:
-                cleanUp();
-                await tryAddLocationsPageDetails();
-                attachObserver();
-                break;
+        try {
+            // Check to make sure we're on a valid page, then modify the page appropriately.
+            switch(location.pathname.replace(/\/$/,"").toLowerCase())
+            {
+                case launchPagePath:
+                    cleanUp();
+                    await tryAddLaunchPageDetails();
+                    break;
+                case homePagePath:
+                case locationsPagePath:
+                    cleanUp();
+                    await tryAddLocationsPageDetails();
+                    break;
+            }
+        } catch (error) {
+            throw error;
         }
     }
 
-    doPageModify();
+    attachObserver();
+    // doPageModify();
 
 
 })();
