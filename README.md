@@ -1,12 +1,10 @@
-# VRChat Website Image Resizer
+# VRChat Website Instance Info
 
-Browser extension to automatically resize images to be <= 2048px before before uploading to VRChat. 
-
-This works by replacing the file picker (html input tag) with our own that first resizes the image using a canvas, and then passes that result to the original file input.
+Browser extension to adds instance owner's name to instances on Home, Locations, and Launch pages.
 
 ## Firefox
 
-The Firefox extension will be published at [addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/vrchat-image-resizer/).
+The Firefox extension will be published at [addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/vrchat-website-instance-info/).
 
 ### Installing Manually / Testing
 
