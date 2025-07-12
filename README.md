@@ -4,7 +4,7 @@ Browser extension to adds instance owner's name to instances on Home, Locations,
 
 ## Firefox
 
-The Firefox extension will be published at [addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/vrchat-website-instance-info/).
+The Firefox extension will be published at [addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/vrchat-instance-info/).
 
 ### Installing Manually / Testing
 
